@@ -21,6 +21,8 @@ export class Server {
     this.port = port;
     this.publicPath = public_path;
     this.routes = routes;
+
+    this.configure();
   }
 
   private configure() {
@@ -44,8 +46,6 @@ export class Server {
 
 
   async start() {
-
-    this.configure();
 
     this.serverListener = this.app.listen(this.port, () => {
       console.log(`Server running on port ${ this.port }`);

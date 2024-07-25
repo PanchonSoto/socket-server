@@ -16,6 +16,7 @@ export class WssService {
         const { server, path='/ws' } = options;
 
         this.wss = new WebSocketServer({server, path});
+        this.start();
     }
 
     static get instance(): WssService {

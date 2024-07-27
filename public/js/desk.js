@@ -28,13 +28,13 @@ function checkTicketCount(currentCount=0) {
     lblPending.innerHTML = currentCount;
 }
 
-
 async function loadInitCount() {
     const pending = await fetch('/api/ticket/pending').then(resp=> resp.json());
     checkTicketCount(pending.length);
 }
 
 async function getTicket() {
+    await finishTicket();
     const {status, ticket, message} = await fetch(`/api/ticket/draw/${deskNumber}`).then(resp=>resp.json());
     if(status==='error') {
         lblCurrentTicket.innerText = message;
@@ -42,6 +42,18 @@ async function getTicket() {
     }
     workingTicket = ticket;
     lblCurrentTicket.innerText = ticket.number;
+}
+
+async function finishTicket() {
+    if(!workingTicket) return;
+    const {status, message} = await fetch(`/api/ticket/done/${workingTicket.id}`,{
+        'method': 'PUT'
+    }).then(resp=>resp.json());
+    console.log({status, message});
+    if(status==='ok') {
+        workingTicket = null;
+        lblCurrentTicket.innerText = 'Nadie';
+    }
 }
 
 function connectToWebSockets() {
@@ -71,6 +83,7 @@ function connectToWebSockets() {
 }
 
 btnDraw.addEventListener('click', getTicket);
+btnDone.addEventListener('click', finishTicket);
 
 connectToWebSockets();
 loadInitCount();
